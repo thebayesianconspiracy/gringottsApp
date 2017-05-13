@@ -53,14 +53,16 @@ public class LoginWebViewActivity extends Activity {
             if(BuildConfig.DEBUG){
                 Log.i(TAG, url);
             }
-            if(url.startsWith("http") || url.startsWith("https")){
+            if ("http://alexa.com".equals(url)) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivityForResult(i, RESULT_LOGIN);
+
+                return true;
+            }
+            else if(url.startsWith("http") || url.startsWith("https")){
                 return super.shouldOverrideUrlLoading(view, url);
             }
-
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            startActivityForResult(i, RESULT_LOGIN);
-
             return true;
         }
 

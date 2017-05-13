@@ -26,19 +26,27 @@ android {
     }
 
 
+    signingConfigs {
+        release {
+		storeFile file('app.keystore') 
+		storePassword "aditya" 
+		keyAlias "aditya"
+		keyPassword "aditya" 
+        }
+    }
     buildTypes {
         debug{
             versionNameSuffix " Debug"
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            signingConfig signingConfigs.releaseConfig
+            signingConfig signingConfigs.release
         }
         release {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            signingConfig signingConfigs.releaseConfig
+            signingConfig signingConfigs.release
         }
     }
 

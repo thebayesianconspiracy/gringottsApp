@@ -12,7 +12,7 @@ import com.willblaschko.android.alexavoicelibrary.utility.SigningKey;
 public class AlexaApplication extends Application {
 
     //Our Amazon application product ID, this is passed to the server when we authenticate
-    private static final String PRODUCT_ID = "interactive_conversation";
+    private static final String PRODUCT_ID = "dobby_alexa_device";
 
 
     //Our Application instance if we need to reference it directly
