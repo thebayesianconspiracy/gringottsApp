@@ -48,6 +48,14 @@ public class TokenManager {
     public final static String PREF_REFRESH_TOKEN = "refresh_token_042017";
     public final static String PREF_TOKEN_EXPIRES = "token_expires_042017";
 
+    private final static String ACK_ACCESS_TOKEN = "Atza|IwEBIJtpEcHCc_3CILDV3rbMlxYKS1O17PQ5KO2jJ" +
+            "j8W-k2pt7JDPnLmoBps1EQIhNmbOZWTmTyZYSET8yYxs3u_q7y0xFGPhuv46zYy_P4rzbXLjGYPhQfxEuXcx_o" +
+            "b4k8NnhR_yAJoE-gbvxpwggv_bgB1Wrw3beE-yTpWqfH-K42HgzyYRJiPUs6FbgSWnINbSVn_mL4DyxvaDq4e" +
+            "yxumV0ctq-VWb2KPNVjOp0Vc8iySTEw80RFFLeleh0JsNAyZJnB-omZmiyqvZvVyAlA7lyl-zT3GUVLEeFnPH" +
+            "Z6TgBE1WZ0GV-O45bTigiikNoWKFJBBhBRfkFqjq5T0Ta469XY2AGrVCLWEfgEQUg40nV9qvTFz5xkS0nyP8o_" +
+            "Rj3XstD_NQPBOHgyRcNhOEn3ciGnuoB9ZcNrWUssWpJBLmn_taSZUmsgbWkLH94l7m1D_i-n-zjVbyNS-zW25" +
+            "pw-IquzZn-NgzUi5dlqR1m36kCSW1LJocKdFlTgPgx2ZWhVRpGeWybl0-ERw7DLUYFS5EC5-pwRN_IT1b_DIJn4vadSLSUF2uPNSz7LDtlCLhI7gCsw";
+
     /**
      * Get an access token from the Amazon servers for the current user
      * @param context local/application level context
@@ -58,11 +66,18 @@ public class TokenManager {
      */
     public static void getAccessToken(final Context context, @NotNull String authCode, @NotNull String codeVerifier, AmazonAuthorizationManager authorizationManager, @Nullable final TokenResponseCallback callback){
 
-        String s = "token";
+        String s = ACK_ACCESS_TOKEN;
         final TokenResponse tokenResponse = new Gson().fromJson(s, TokenResponse.class);
-        callback.onSuccess(tokenResponse);
-        return;
 
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onSuccess(tokenResponse);
+            }
+        });
+
+/*
         //this url shouldn't be hardcoded, but it is, it's the Amazon auth access token endpoint
         String url = "https://api.amazon.com/auth/O2/token";
 
@@ -124,7 +139,7 @@ public class TokenManager {
                 }
             }
         });
-
+*/
     }
 
     /**
@@ -164,6 +179,19 @@ public class TokenManager {
      * @param refreshToken the refresh token we have stored in local cache (sharedPreferences)
      */
     private static void getRefreshToken(@NotNull AmazonAuthorizationManager authorizationManager, @NotNull final Context context, @NotNull final TokenCallback callback, String refreshToken){
+
+        final String s = ACK_ACCESS_TOKEN;
+        final TokenResponse tokenResponse = new Gson().fromJson(s, TokenResponse.class);
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onSuccess(s);
+            }
+        });
+
+
+        /*
         //this url shouldn't be hardcoded, but it is, it's the Amazon auth access token endpoint
         String url = "https://api.amazon.com/auth/O2/token";
 
@@ -219,6 +247,7 @@ public class TokenManager {
                 });
             }
         });
+        */
     }
 
     /**
