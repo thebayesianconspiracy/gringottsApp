@@ -57,6 +57,12 @@ public class TokenManager {
      * @param callback the callback for state changes
      */
     public static void getAccessToken(final Context context, @NotNull String authCode, @NotNull String codeVerifier, AmazonAuthorizationManager authorizationManager, @Nullable final TokenResponseCallback callback){
+
+        String s = "token";
+        final TokenResponse tokenResponse = new Gson().fromJson(s, TokenResponse.class);
+        callback.onSuccess(tokenResponse);
+        return;
+
         //this url shouldn't be hardcoded, but it is, it's the Amazon auth access token endpoint
         String url = "https://api.amazon.com/auth/O2/token";
 
