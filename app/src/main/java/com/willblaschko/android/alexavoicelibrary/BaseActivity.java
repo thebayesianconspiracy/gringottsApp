@@ -195,7 +195,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
      * https://developer.amazon.com/public/solutions/alexa/alexa-voice-service/reference/audioplayer#PlaybackNearlyFinished Event
      */
     private void sendPlaybackStartedEvent(AvsItem item){
-        alexaManager.sendPlaybackStartedEvent(item, 5000, null);
+        alexaManager.sendPlaybackStartedEvent(item, 1000, null);
         Log.i(TAG, "Sending SpeechStartedEvent");
     }
 
@@ -251,7 +251,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
      * @param response a List<AvsItem> returned from the mAlexaManager.sendTextRequest() call in sendVoiceToAlexa()
      */
     private void handleResponse(AvsResponse response){
-        boolean checkAfter = (avsQueue.size() == 0);
+        boolean checkAfter = true;//(avsQueue.size() == 0);
         if(response != null){
             //if we have a clear queue item in the list, we need to clear the current queue before proceeding
             //iterate backwards to avoid changing our array positions and getting all the nasty errors that come
@@ -384,6 +384,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
                 }
             });
 
+            avsQueue.remove(current);
+            checkQueue();
+        }
+        else {
             avsQueue.remove(current);
             checkQueue();
         }
