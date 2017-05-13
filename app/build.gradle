@@ -11,6 +11,10 @@ android {
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
 
+    lintOptions {
+        abortOnError false
+    }
+
     defaultConfig {
         applicationId "com.willblaschko.android.alexavoicelibrary"
         minSdkVersion 21
@@ -46,6 +50,7 @@ android {
         exclude 'META-INF/LICENSE'
     }
 }
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
