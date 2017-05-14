@@ -28,7 +28,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:scaleType="fitXY"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@mipmap/right_vectors" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -74,6 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
+                    android:layout_marginRight="5dp"
                     android:text="String"
                     android:textSize="24sp"
                     android:layout_alignParentBottom="true"

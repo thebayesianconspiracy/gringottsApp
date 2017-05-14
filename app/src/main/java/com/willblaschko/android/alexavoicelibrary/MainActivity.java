@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -258,12 +259,15 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                 TextView subheading = (TextView) holder.mTextView.findViewById(R.id.subheading);
                 TextView info_text = (TextView) holder.mTextView.findViewById(R.id.info_text);
                 TextView amount = (TextView) holder.mTextView.findViewById(R.id.money);
+                ImageView imageView = (ImageView) holder.mTextView.findViewById(R.id.image);
                 try {
                     JSONObject obj = new JSONObject(mDataset.get(position).getAlexaMessge());
                     if (mDataset.get(position).getIntent().equals("transfer")) {
                         title.setText("TRANSFER");
+                        imageView.setImageResource(R.mipmap.right_vectors3);
                     } else if (mDataset.get(position).getIntent().equals("paybill")) {
                         title.setText("PAY BILL");
+                        imageView.setImageResource(R.mipmap.right_vectors);
                     }
                     subheading.setText("Name : " + obj.get("name").toString());
                     info_text.setText(" Amount : " + obj.get("amount").toString());
@@ -417,6 +421,10 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                         if (obj.get("intent").toString().equals("CardBlockIntent"))
                         {
                             payloadCard.setAlexaMessge("Block my card");
+                        }
+                        if (obj.get("intent").toString().equals("AuthQ"))
+                        {
+                            payloadCard.setAlexaMessge("Authorize me");
                         }
 
                         addAlexaCard(payloadCard);
