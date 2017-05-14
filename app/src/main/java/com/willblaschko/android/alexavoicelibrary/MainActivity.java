@@ -28,9 +28,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.util.Strings;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -212,15 +210,18 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         @Override
         public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                        int viewType) {
+            LinearLayout v = null;
             if (this.cardType.equals("alexa")) {
                 // create a new view
-                LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.cardview, parent, false);
-
-                ViewHolder vh = new ViewHolder(v);
-                return vh;
+                 v = (LinearLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.cardview_alexa, parent, false);
             }
-            return null;
+            if (this.cardType.equals("user")) {
+                // create a new view
+                 v = (LinearLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.cardview_user, parent, false);
+            }
+            return new ViewHolder(v);
         }
 
         // Replace the contents of a view (invoked by the layout manager)
