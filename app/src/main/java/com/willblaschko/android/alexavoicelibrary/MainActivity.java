@@ -1,5 +1,6 @@
 package com.willblaschko.android.alexavoicelibrary;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,7 +19,10 @@ import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.SendAudioActionFragment;
 
+import java.io.IOException;
+
 import ai.kitt.snowboy.AppResCopy;
+import ai.kitt.snowboy.Constants;
 import ai.kitt.snowboy.MsgEnum;
 import ai.kitt.snowboy.audio.AudioDataSaver;
 import ai.kitt.snowboy.audio.PlaybackThread;
@@ -37,8 +41,9 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private TextView status;
     private View loading;
 
-    private RecordingThread recordingThread;
-    private PlaybackThread playbackThread;
+    private MediaPlayer player = new MediaPlayer();
+    private static String strEnvWorkSpace = Constants.DEFAULT_WORK_SPACE;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,11 +61,6 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         loading = findViewById(R.id.loading);
 
         AppResCopy.copyResFromAssetsToSD(this);
-
-        recordingThread = new RecordingThread(handle, new AudioDataSaver());
-        playbackThread = new PlaybackThread();
-
-        //ActionsFragment fragment = new ActionsFragment();
         loadFragment(new SendAudioActionFragment(), false);
 
 
@@ -88,32 +88,6 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             transaction.addToBackStack(fragment.getClass().getSimpleName());
         }
         transaction.commit();
-    }
-
-    private void startRecording() {
-        recordingThread.startRecording();
-        updateLog(" ----> recording started ...green");
-    }
-
-    private void stopRecording() {
-        recordingThread.stopRecording();
-        updateLog(" ----> recording stopped green");
-    }
-
-    private void startPlayback() {
-        updateLog(" ----> playback started ... green");
-        // (new PcmPlayer()).playPCM();
-        playbackThread.startPlayback();
-    }
-
-    private void stopPlayback() {
-        updateLog(" ----> playback stopped green");
-        playbackThread.stopPlayback();
-    }
-
-    private void sleep() {
-        try { Thread.sleep(500);
-        } catch (Exception e) {}
     }
 
 
@@ -184,36 +158,6 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     void showToast(CharSequence msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
-
-
-    public Handler handle = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            MsgEnum message = MsgEnum.getMsgEnum(msg.what);
-            switch(message) {
-                case MSG_ACTIVE:
-                    updateLog(" ----> Detected times, green");
-                    // Toast.makeText(Demo.this, "Active ", Toast.LENGTH_SHORT).show();
-                    showToast("Active ");
-                    break;
-                case MSG_INFO:
-                    updateLog(" ----> "+message);
-                    break;
-                case MSG_VAD_SPEECH:
-                    updateLog(" ----> normal voice, blue");
-                    break;
-                case MSG_VAD_NOSPEECH:
-                    updateLog(" ----> no speech, blue");
-                    break;
-                case MSG_ERROR:
-                    updateLog(" ----> red");
-                    break;
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    };
 
     public void updateLog(String text) {
         Log.i(text, "snow logs");
