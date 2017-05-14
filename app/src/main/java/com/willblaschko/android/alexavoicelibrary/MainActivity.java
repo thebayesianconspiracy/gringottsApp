@@ -28,8 +28,11 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.util.Strings;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 
 import static com.willblaschko.android.alexavoicelibrary.R.id.frame;
 
@@ -46,6 +49,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
     private RecyclerView mRecyclerView;
     private MyAdapter myAdapter;
+    private ArrayList<String> payloadList;
 
     MqttAndroidClient mqttAndroidClient;
     final String serverUri = "tcp://broker.hivemq.com:1883";
@@ -78,6 +82,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         //loadFragment(fragment, false);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        payloadList = new ArrayList<>();
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -88,10 +93,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        String[] myDataset = new String[2];
-        myDataset[0] = "String 0 ";
-        myDataset[1] = "String 1";
-        myAdapter = new MyAdapter(myDataset);
+        payloadList.add("String 0");
+        myAdapter = new MyAdapter(payloadList);
 
         mRecyclerView.setAdapter(myAdapter);
         initMQTT();
@@ -186,7 +189,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-        private String[] mDataset;
+        private ArrayList<String> mDataset;
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
@@ -201,7 +204,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         }
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(String[] myDataset) {
+        public MyAdapter(ArrayList<String> myDataset) {
             mDataset = myDataset;
         }
 
@@ -217,25 +220,20 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             return vh;
         }
 
-        public void addToCard(String message) {
-            this.mDataset[this.getItemCount()] = message;
-            this.notifyItemInserted(this.getItemCount());
-        }
-
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             TextView textView = (TextView) holder.mTextView.findViewById(R.id.info_text);
-            textView.setText(mDataset[position]);
+            textView.setText(mDataset.get(position));
 
         }
 
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return mDataset.length;
+            return mDataset.size();
         }
     }
 
@@ -267,7 +265,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
                     JSONObject obj = new JSONObject(new String(message.getPayload()));
                     Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("text").toString(), Toast.LENGTH_LONG).show();
-
+                    addAlexaCard(obj.get("text").toString());
 
                 } catch (Throwable t) {
                     t.printStackTrace();
@@ -326,7 +324,6 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     Toast.makeText(MainActivity.this, "Failed to subscribe", Toast.LENGTH_LONG).show();
-
                 }
             });
             mqttAndroidClient.subscribe(alexa_topic, 0, null, new IMqttActionListener() {
@@ -350,7 +347,9 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     }
 
     private void addAlexaCard(String message) {
-        myAdapter.addToCard(message);
+        payloadList.add(message);
+        myAdapter.notifyDataSetChanged();
+        myAdapter.notifyDataSetChanged();
     }
 
 
