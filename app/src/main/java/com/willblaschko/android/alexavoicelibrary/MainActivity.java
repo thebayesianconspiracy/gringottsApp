@@ -7,16 +7,28 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.SendAudioActionFragment;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import static com.willblaschko.android.alexavoicelibrary.R.id.frame;
@@ -33,7 +45,18 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private View loading;
 
     private RecyclerView mRecyclerView;
+    private MyAdapter myAdapter;
 
+    MqttAndroidClient mqttAndroidClient;
+    final String serverUri = "tcp://broker.hivemq.com:1883";
+    final String customer_id = "33336369";
+
+
+    String clientId = "VoicePayClient";
+    final String user_topic = "/text/" + customer_id + "/messages/user";
+    final String alexa_topic = "/text/" + customer_id + "/messages/alexa";
+    final String publishTopic = "exampleAndroidPublishTopic";
+    final String publishMessage = "Hello World!";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,9 +91,10 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         String[] myDataset = new String[2];
         myDataset[0] = "String 0 ";
         myDataset[1] = "String 1";
-        MyAdapter mAdapter = new MyAdapter(myDataset);
+        myAdapter = new MyAdapter(myDataset);
 
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(myAdapter);
+        initMQTT();
     }
 
     @Override
@@ -193,6 +217,11 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             return vh;
         }
 
+        public void addToCard(String message) {
+            this.mDataset[this.getItemCount()] = message;
+            this.notifyItemInserted(this.getItemCount());
+        }
+
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
@@ -208,6 +237,120 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         public int getItemCount() {
             return mDataset.length;
         }
+    }
+
+    private void initMQTT() {
+        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), serverUri, clientId);
+        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+
+                if (reconnect) {
+                    Toast.makeText(MainActivity.this, "Reconnected to : " + serverURI, Toast.LENGTH_LONG).show();
+
+                    // Because Clean Session is true, we need to re-subscribe
+                    subscribeToTopic();
+                } else {
+                    Toast.makeText(MainActivity.this, "Connected to: " + serverURI, Toast.LENGTH_LONG).show();
+
+                }
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+                Toast.makeText(MainActivity.this, "The Connection was lost.", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                try {
+
+                    JSONObject obj = new JSONObject(new String(message.getPayload()));
+                    Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("text").toString(), Toast.LENGTH_LONG).show();
+
+
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    Log.e("My App", "Could not parse malformed JSON: ");
+                }
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
+
+        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+        mqttConnectOptions.setAutomaticReconnect(true);
+        mqttConnectOptions.setCleanSession(true);
+
+        try {
+            mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
+                    disconnectedBufferOptions.setBufferEnabled(true);
+                    disconnectedBufferOptions.setBufferSize(100);
+                    disconnectedBufferOptions.setPersistBuffer(false);
+                    disconnectedBufferOptions.setDeleteOldestMessages(false);
+                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+                    subscribeToTopic();
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    exception.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Failed to connect to: " + serverUri, Toast.LENGTH_LONG).show();
+
+                }
+            });
+
+
+        } catch (MqttException ex){
+            ex.printStackTrace();
+        }
+
+
+    }
+
+    public void subscribeToTopic(){
+        try {
+            mqttAndroidClient.subscribe(user_topic, 0, null, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Toast.makeText(MainActivity.this, "Failed to subscribe", Toast.LENGTH_LONG).show();
+
+                }
+            });
+            mqttAndroidClient.subscribe(alexa_topic, 0, null, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Toast.makeText(MainActivity.this, "Failed to subscribe", Toast.LENGTH_LONG).show();
+
+                }
+            });
+
+        } catch (MqttException ex){
+            System.err.println("Exception whilst subscribing");
+            ex.printStackTrace();
+        }
+    }
+
+    private void addAlexaCard(String message) {
+        myAdapter.addToCard(message);
     }
 
 
