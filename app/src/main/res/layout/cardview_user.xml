@@ -12,7 +12,7 @@
         android:layout_width="fill_parent"
         android:layout_height="60dp"
         card_view:cardCornerRadius="6dp"
-        card_view:cardElevation="4dp"
+        card_view:cardElevation="2dp"
         android:layout_gravity="center_vertical"
         card_view:cardUseCompatPadding="true"
         android:layout_margin="2dp"

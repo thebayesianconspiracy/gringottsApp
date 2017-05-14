@@ -333,8 +333,42 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                         {
                             JSONObject a = new JSONObject(obj.get("slots").toString());
                             payloadCard.setAlexaMessge("How much money did I spend in the last "+(a).get("days").toString()+" days?");
+                        }
+                        if (obj.get("intent").toString().equals("CheckBillIntent"))
+                        {
+                            JSONObject a = new JSONObject(obj.get("slots").toString());
+                            payloadCard.setAlexaMessge("What is my "+(a).get("billName").toString()+" bill for " + (a).get("billDate") + "?");
+                        }
+                        if (obj.get("intent").toString().equals("TransferIntent"))
+                        {
+                            JSONObject a = new JSONObject(obj.get("slots").toString());
+                            payloadCard.setAlexaMessge("Transfer "+(a).get("payeeAmount").toString()+" rupees to " + (a).get("payeeName"));
+                        }
+                        if (obj.get("intent").toString().equals("PayBillIntent"))
+                        {
+                            JSONObject a = new JSONObject(obj.get("slots").toString());
+                            payloadCard.setAlexaMessge("Pay "+(a).get("billName").toString()+" bill");
+                        }
+                        if (obj.get("intent").toString().equals("AddPayeeIntent"))
+                        {
+                            JSONObject a = new JSONObject(obj.get("slots").toString());
+                            payloadCard.setAlexaMessge("Add "+(a).get("payeeName").toString()+" with VPA " + (a).get("payeeVPA").toString() + " as my payee");
+                        }
 
+                        if (obj.get("intent").toString().equals("CustomerCareIntent"))
+                        {
+                            payloadCard.setAlexaMessge("Call customer care.");
+                        }
 
+                        if (obj.get("intent").toString().equals("CCOptionIntent"))
+                        {
+                            JSONObject a = new JSONObject(obj.get("slots").toString());
+                            payloadCard.setAlexaMessge("Query about : "+(a).get("answer").toString());
+                        }
+
+                        if (obj.get("intent").toString().equals("CardBlockIntent"))
+                        {
+                            payloadCard.setAlexaMessge("Block my card");
                         }
 
                         addAlexaCard(payloadCard);
