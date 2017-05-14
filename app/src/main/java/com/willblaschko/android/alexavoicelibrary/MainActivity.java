@@ -1,17 +1,26 @@
 package com.willblaschko.android.alexavoicelibrary;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
+import android.util.Log;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.SendAudioActionFragment;
 
+import ai.kitt.snowboy.MsgEnum;
+import ai.kitt.snowboy.audio.AudioDataSaver;
+import ai.kitt.snowboy.audio.PlaybackThread;
 import ai.kitt.snowboy.audio.RecordingThread;
 
 import static com.willblaschko.android.alexavoicelibrary.R.id.frame;
@@ -28,6 +37,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private View loading;
 
     private RecordingThread recordingThread;
+    private PlaybackThread playbackThread;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,8 +54,13 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         status = (TextView) findViewById(R.id.status);
         loading = findViewById(R.id.loading);
 
+        recordingThread = new RecordingThread(handle, new AudioDataSaver());
+        playbackThread = new PlaybackThread();
+
         //ActionsFragment fragment = new ActionsFragment();
         loadFragment(new SendAudioActionFragment(), false);
+
+
         //loadFragment(fragment, false);
     }
 
@@ -70,6 +85,32 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             transaction.addToBackStack(fragment.getClass().getSimpleName());
         }
         transaction.commit();
+    }
+
+    private void startRecording() {
+        recordingThread.startRecording();
+        updateLog(" ----> recording started ...green");
+    }
+
+    private void stopRecording() {
+        recordingThread.stopRecording();
+        updateLog(" ----> recording stopped green");
+    }
+
+    private void startPlayback() {
+        updateLog(" ----> playback started ... green");
+        // (new PcmPlayer()).playPCM();
+        playbackThread.startPlayback();
+    }
+
+    private void stopPlayback() {
+        updateLog(" ----> playback stopped green");
+        playbackThread.stopPlayback();
+    }
+
+    private void sleep() {
+        try { Thread.sleep(500);
+        } catch (Exception e) {}
     }
 
 
@@ -135,5 +176,43 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
         return true;
+    }
+
+    void showToast(CharSequence msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+
+    public Handler handle = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            MsgEnum message = MsgEnum.getMsgEnum(msg.what);
+            switch(message) {
+                case MSG_ACTIVE:
+                    updateLog(" ----> Detected times, green");
+                    // Toast.makeText(Demo.this, "Active ", Toast.LENGTH_SHORT).show();
+                    showToast("Active ");
+                    break;
+                case MSG_INFO:
+                    updateLog(" ----> "+message);
+                    break;
+                case MSG_VAD_SPEECH:
+                    updateLog(" ----> normal voice, blue");
+                    break;
+                case MSG_VAD_NOSPEECH:
+                    updateLog(" ----> no speech, blue");
+                    break;
+                case MSG_ERROR:
+                    updateLog(" ----> red");
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
+
+    public void updateLog(String text) {
+        Log.i(text, "snow logs");
     }
 }
