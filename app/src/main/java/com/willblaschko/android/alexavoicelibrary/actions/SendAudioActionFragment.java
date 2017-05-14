@@ -1,8 +1,11 @@
 package com.willblaschko.android.alexavoicelibrary.actions;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -19,6 +22,10 @@ import com.willblaschko.android.recorderview.RecorderView;
 
 import java.io.IOException;
 
+import ai.kitt.snowboy.MsgEnum;
+import ai.kitt.snowboy.audio.AudioDataSaver;
+import ai.kitt.snowboy.audio.PlaybackThread;
+import ai.kitt.snowboy.audio.RecordingThread;
 import ee.ioc.phon.android.speechutils.RawAudioRecorder;
 import okio.BufferedSink;
 
@@ -35,10 +42,16 @@ public class SendAudioActionFragment extends BaseListenerFragment {
     private static final int AUDIO_RATE = 16000;
     private RawAudioRecorder recorder;
     private RecorderView recorderView;
+    private RecordingThread recordingThread;
+    private PlaybackThread playbackThread;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        recordingThread = new RecordingThread(handle, new AudioDataSaver());
+        playbackThread = new PlaybackThread();
+
+        this.startRecording();
         return inflater.inflate(R.layout.fragment_action_audio, container, false);
     }
 
@@ -56,6 +69,29 @@ public class SendAudioActionFragment extends BaseListenerFragment {
                 }
             }
         });
+    }
+
+    private void startRecording() {
+        recordingThread.startRecording();
+    }
+
+
+    private void stopRecording() {
+        recordingThread.stopRecording();
+    }
+
+    private void startPlayback() {
+        // (new PcmPlayer()).playPCM();
+        playbackThread.startPlayback();
+    }
+
+    private void stopPlayback() {
+        playbackThread.stopPlayback();
+    }
+
+    private void sleep() {
+        try { Thread.sleep(500);
+        } catch (Exception e) {}
     }
 
     @Override
@@ -108,6 +144,12 @@ public class SendAudioActionFragment extends BaseListenerFragment {
         }
         recorder.start();
         alexaManager.sendAudioRequest(requestBody, getRequestCallback());
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                stopListening();
+//            }
+//        }, 2500);
     }
 
     private DataRequestBody requestBody = new DataRequestBody() {
@@ -149,8 +191,53 @@ public class SendAudioActionFragment extends BaseListenerFragment {
             recorder.stop();
             recorder.release();
             recorder = null;
+            while (true) {
+                try {
+                    startRecording();
+                    break;
+                } catch(Exception e) {
+
+                }
+            }
         }
     }
+
+    public Handler handle = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            MsgEnum message = MsgEnum.getMsgEnum(msg.what);
+            switch(message) {
+                case MSG_ACTIVE:
+                    // Toast.makeText(Demo.this, "Active ", Toast.LENGTH_SHORT).show();
+                    stopRecording();
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            startListening();
+                        }
+                    }, 500);
+                    Intent intent = getActivity().getIntent();
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // You need this if starting
+                    // the activity from a service
+                    intent.setAction(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    startActivity(intent);
+                    break;
+                case MSG_INFO:
+                    break;
+                case MSG_VAD_SPEECH:
+                    break;
+                case MSG_VAD_NOSPEECH:
+                    break;
+                case MSG_ERROR:
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected String getTitle() {

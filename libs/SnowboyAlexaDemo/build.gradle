@@ -1,26 +1,23 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
     }
 }
+apply plugin: 'android-library'
 
-apply plugin: 'com.android.library'
-
+dependencies {
+    compile fileTree(include: '*.jar', dir: 'libs')
+}
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '25.0.0'
-
-    defaultConfig {
-        minSdkVersion 11
-        targetSdkVersion 24
-
+    signingConfigs {
     }
-
+    compileSdkVersion 25
+    buildToolsVersion '25.0.0'
+    compileOptions.encoding = 'ISO-8859-1'
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -44,5 +41,12 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+    buildTypes {
+        release {
+        }
+    }
+    defaultConfig {
+    }
+    productFlavors {
+    }
 }
-
