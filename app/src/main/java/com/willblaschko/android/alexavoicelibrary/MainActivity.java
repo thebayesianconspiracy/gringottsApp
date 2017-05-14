@@ -2,31 +2,20 @@ package com.willblaschko.android.alexavoicelibrary;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.SendAudioActionFragment;
-
-import java.io.IOException;
-
 import ai.kitt.snowboy.AppResCopy;
 import ai.kitt.snowboy.Constants;
-import ai.kitt.snowboy.MsgEnum;
-import ai.kitt.snowboy.audio.AudioDataSaver;
-import ai.kitt.snowboy.audio.PlaybackThread;
-import ai.kitt.snowboy.audio.RecordingThread;
+
 
 import static com.willblaschko.android.alexavoicelibrary.R.id.frame;
 
@@ -69,6 +58,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
     @Override
     protected void startListening() {
+
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
         if (fragment != null && fragment.isVisible()) {
             // add your code here
