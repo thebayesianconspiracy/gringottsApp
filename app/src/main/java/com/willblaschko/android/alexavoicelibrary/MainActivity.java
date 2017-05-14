@@ -28,6 +28,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -57,6 +58,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     String clientId = "VoicePayClient";
     final String user_topic = "/text/" + customer_id + "/messages/user";
     final String alexa_topic = "/text/" + customer_id + "/messages/alexa";
+    final String result_topic = "/text/" + customer_id + "/messages/result";
+
     final String publishTopic = "exampleAndroidPublishTopic";
     final String publishMessage = "Hello World!";
 
@@ -222,6 +225,11 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                  v = (LinearLayout) LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.cardview_user, parent, false);
             }
+            if (viewType == 2) {
+                // create a new view
+                v = (LinearLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.cardview_result, parent, false);
+            }
             return new ViewHolder(v);
         }
         @Override
@@ -232,6 +240,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                 return 0;
             } else if (vo.getType().equals("alexa")) {
                 return 1;
+            } else if (vo.getType().equals("result")) {
+                return 2;
             }
             return 0;
         }
@@ -240,8 +250,30 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            TextView textView = (TextView) holder.mTextView.findViewById(R.id.info_text);
-            textView.setText(mDataset.get(position).getAlexaMessge());
+            if (!mDataset.get(position).getType().equals("result")) {
+                TextView textView = (TextView) holder.mTextView.findViewById(R.id.info_text);
+                textView.setText(mDataset.get(position).getAlexaMessge());
+            } else {
+                TextView title = (TextView) holder.mTextView.findViewById(R.id.title);
+                TextView subheading = (TextView) holder.mTextView.findViewById(R.id.subheading);
+                TextView info_text = (TextView) holder.mTextView.findViewById(R.id.info_text);
+                TextView amount = (TextView) holder.mTextView.findViewById(R.id.money);
+                try {
+                    JSONObject obj = new JSONObject(mDataset.get(position).getAlexaMessge());
+                    if (mDataset.get(position).getIntent().equals("transfer")) {
+                        title.setText("TRANSFER");
+                    } else if (mDataset.get(position).getIntent().equals("paybill")) {
+                        title.setText("PAY BILL");
+                    }
+                    subheading.setText("Name : " + obj.get("name").toString());
+                    info_text.setText(" Amount : " + obj.get("amount").toString());
+                    amount.setText(obj.get("balance").toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e("My App", "Could not parse malformed JSON: ");
+
+                }
+            }
 
         }
 
@@ -287,15 +319,31 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
+                Toast.makeText(MainActivity.this, "Incoming message: " + message.toString(), Toast.LENGTH_LONG).show();
+
+                if (topic.equals(result_topic)) {
+                    try {
+
+                        JSONObject obj = new JSONObject(new String(message.getPayload()));
+                        PayloadCard payloadCard = new PayloadCard();
+                        payloadCard.setType("result");
+                        payloadCard.setIntent(obj.get("intent").toString());
+                        payloadCard.setAlexaMessge(obj.get("alexaData").toString());
+
+                        addAlexaCard(payloadCard);
+
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                        Log.e("My App", "Could not parse malformed JSON: ");
+                    }
+                }
                 if (topic.equals(alexa_topic)) {
                     try {
 
                         JSONObject obj = new JSONObject(new String(message.getPayload()));
-                        Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("text").toString(), Toast.LENGTH_LONG).show();
                         PayloadCard payloadCard = new PayloadCard();
                         payloadCard.setType("alexa");
-
-
+                        payloadCard.setIntent(obj.get("intent").toString());
                         payloadCard.setAlexaMessge(obj.get("text").toString());
 
 
@@ -310,9 +358,9 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                     try {
 
                         JSONObject obj = new JSONObject(new String(message.getPayload()));
-                        Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("intent").toString(), Toast.LENGTH_LONG).show();
                         PayloadCard payloadCard = new PayloadCard();
                         payloadCard.setType("user");
+                        payloadCard.setIntent(obj.get("intent").toString());
                         if (obj.get("intent").toString().equals("BalanceIntent"))
                         {
                             payloadCard.setAlexaMessge("What is my account balance?");
@@ -434,6 +482,19 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                 }
             });
             mqttAndroidClient.subscribe(alexa_topic, 0, null, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Toast.makeText(MainActivity.this, "Failed to subscribe", Toast.LENGTH_LONG).show();
+
+                }
+            });
+            mqttAndroidClient.subscribe(result_topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
