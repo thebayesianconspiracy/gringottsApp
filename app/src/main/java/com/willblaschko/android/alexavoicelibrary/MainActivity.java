@@ -70,6 +70,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setTitle(R.string.app_name);
         //Listen for changes in the back stack
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change
