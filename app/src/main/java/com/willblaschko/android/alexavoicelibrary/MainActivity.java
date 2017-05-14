@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
     private RecyclerView mRecyclerView;
     private MyAdapter myAdapter;
-    private ArrayList<String> payloadList;
+    private ArrayList<PayloadCard> payloadList;
 
     MqttAndroidClient mqttAndroidClient;
     final String serverUri = "tcp://broker.hivemq.com:1883";
@@ -93,7 +93,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        payloadList.add("String 0");
+        //payloadList.add("String 0");
         myAdapter = new MyAdapter(payloadList);
 
         mRecyclerView.setAdapter(myAdapter);
@@ -189,13 +189,13 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-        private ArrayList<String> mDataset;
+        private ArrayList<PayloadCard> mDataset;
+        private String cardType;
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class ViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
             public LinearLayout mTextView;
             public ViewHolder(LinearLayout v) {
                 super(v);
@@ -204,7 +204,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         }
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(ArrayList<String> myDataset) {
+        public MyAdapter(ArrayList<PayloadCard> myDataset) {
             mDataset = myDataset;
         }
 
@@ -212,12 +212,15 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         @Override
         public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                        int viewType) {
-            // create a new view
-            LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.cardview, parent, false);
+            if (this.cardType.equals("alexa")) {
+                // create a new view
+                LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.cardview, parent, false);
 
-            ViewHolder vh = new ViewHolder(v);
-            return vh;
+                ViewHolder vh = new ViewHolder(v);
+                return vh;
+            }
+            return null;
         }
 
         // Replace the contents of a view (invoked by the layout manager)
@@ -226,7 +229,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             TextView textView = (TextView) holder.mTextView.findViewById(R.id.info_text);
-            textView.setText(mDataset.get(position));
+            textView.setText(mDataset.get(position).getAlexaMessge());
 
         }
 
@@ -235,6 +238,17 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         public int getItemCount() {
             return mDataset.size();
         }
+
+
+        public String getCardType() {
+            return cardType;
+        }
+
+        public void setCardType(String cardType) {
+            this.cardType = cardType;
+        }
+
+
     }
 
     private void initMQTT() {
@@ -261,15 +275,39 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                try {
+                if (topic.equals(alexa_topic)) {
+                    try {
 
-                    JSONObject obj = new JSONObject(new String(message.getPayload()));
-                    Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("text").toString(), Toast.LENGTH_LONG).show();
-                    addAlexaCard(obj.get("text").toString());
+                        JSONObject obj = new JSONObject(new String(message.getPayload()));
+                        Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("text").toString(), Toast.LENGTH_LONG).show();
+                        PayloadCard payloadCard = new PayloadCard();
+                        payloadCard.setType("alexa");
+                        payloadCard.setAlexaMessge(obj.get("text").toString());
+                        addAlexaCard(payloadCard);
 
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    Log.e("My App", "Could not parse malformed JSON: ");
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                        Log.e("My App", "Could not parse malformed JSON: ");
+                    }
+                }
+                if (topic.equals(user_topic)) {
+                    try {
+
+                        JSONObject obj = new JSONObject(new String(message.getPayload()));
+                        Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("intent").toString(), Toast.LENGTH_LONG).show();
+                        PayloadCard payloadCard = new PayloadCard();
+                        payloadCard.setType("user");
+                        if (obj.get("intent").toString().equals("BalanceIntent"))
+                        {
+                            payloadCard.setAlexaMessge("What is my account balance?");
+
+                        }
+                        addAlexaCard(payloadCard);
+
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                        Log.e("My App", "Could not parse malformed JSON: ");
+                    }
                 }
             }
 
@@ -346,11 +384,14 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         }
     }
 
-    private void addAlexaCard(String message) {
-        payloadList.add(message);
+    private void addAlexaCard(PayloadCard payloadCard) {
+        payloadList.add(payloadCard);
+        myAdapter.setCardType(payloadCard.getType());
         myAdapter.notifyDataSetChanged();
         myAdapter.notifyDataSetChanged();
     }
+
+
 
 
 }

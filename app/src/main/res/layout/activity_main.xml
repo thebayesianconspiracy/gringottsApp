@@ -10,7 +10,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignTop="@+id/bottom_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="450dp"/>
 
 
     <LinearLayout
