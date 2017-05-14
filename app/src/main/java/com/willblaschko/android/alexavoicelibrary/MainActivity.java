@@ -12,6 +12,8 @@ import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.SendAudioActionFragment;
 
+import ai.kitt.snowboy.audio.RecordingThread;
+
 import static com.willblaschko.android.alexavoicelibrary.R.id.frame;
 
 /**
@@ -25,6 +27,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private TextView status;
     private View loading;
 
+    private RecordingThread recordingThread;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
