@@ -29,6 +29,8 @@
                 android:src="@mipmap/ic_launcher"/>
             <TextView
                 android:text="String"
+                android:autoLink="web"
+                android:linksClickable="true"
                 android:paddingLeft="50dp"
                 android:id="@+id/info_text"
                 android:layout_width="fill_parent"

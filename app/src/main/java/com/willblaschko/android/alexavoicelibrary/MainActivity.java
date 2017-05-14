@@ -211,19 +211,30 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                        int viewType) {
             LinearLayout v = null;
-            if (this.cardType.equals("alexa")) {
+            Log.i("viewType", "view " + viewType);
+            if (viewType == 1) {
                 // create a new view
                  v = (LinearLayout) LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.cardview_alexa, parent, false);
             }
-            if (this.cardType.equals("user")) {
+            if (viewType == 0) {
                 // create a new view
                  v = (LinearLayout) LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.cardview_user, parent, false);
             }
             return new ViewHolder(v);
         }
-
+        @Override
+        public int getItemViewType(int position) {
+            //Implement your logic here
+            PayloadCard vo = mDataset.get(position);
+            if (vo.getType().equals("user")) {
+                return 0;
+            } else if (vo.getType().equals("alexa")) {
+                return 1;
+            }
+            return 0;
+        }
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
@@ -283,7 +294,11 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                         Toast.makeText(MainActivity.this, "Incoming message: " + obj.get("text").toString(), Toast.LENGTH_LONG).show();
                         PayloadCard payloadCard = new PayloadCard();
                         payloadCard.setType("alexa");
+
+
                         payloadCard.setAlexaMessge(obj.get("text").toString());
+
+
                         addAlexaCard(payloadCard);
 
                     } catch (Throwable t) {
@@ -305,6 +320,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                         }
                         if (obj.get("intent").toString().equals("SplitwiseBalanceIntent"))
                         {
+
                             payloadCard.setAlexaMessge("What is my Splitwise balance?");
 
                         }
@@ -316,7 +332,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                         if (obj.get("intent").toString().equals("MoneySpentIntent"))
                         {
                             JSONObject a = new JSONObject(obj.get("slots").toString());
-                            payloadCard.setAlexaMessge("How much money did I spend in the last"+(a).get("days").toString());
+                            payloadCard.setAlexaMessge("How much money did I spend in the last "+(a).get("days").toString()+" days?");
 
 
                         }
