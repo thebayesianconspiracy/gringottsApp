@@ -50,7 +50,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private ArrayList<PayloadCard> payloadList;
 
     MqttAndroidClient mqttAndroidClient;
-    final String serverUri = "tcp://broker.hivemq.com:1883";
+    final String serverUri = "tcp://192.168.1.11:1883";
     final String customer_id = "33336369";
 
 
@@ -303,6 +303,24 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                             payloadCard.setAlexaMessge("What is my account balance?");
 
                         }
+                        if (obj.get("intent").toString().equals("SplitwiseBalanceIntent"))
+                        {
+                            payloadCard.setAlexaMessge("What is my Splitwise balance?");
+
+                        }
+                        if (obj.get("intent").toString().equals("SplitwiseMaxOweIntent"))
+                        {
+                            payloadCard.setAlexaMessge("Whom do I owe the most on Splitwise?");
+
+                        }
+                        if (obj.get("intent").toString().equals("MoneySpentIntent"))
+                        {
+                            JSONObject a = new JSONObject(obj.get("slots").toString());
+                            payloadCard.setAlexaMessge("How much money did I spend in the last"+(a).get("days").toString());
+
+
+                        }
+
                         addAlexaCard(payloadCard);
 
                     } catch (Throwable t) {
