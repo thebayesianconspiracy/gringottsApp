@@ -18,6 +18,7 @@ import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.SendAudioActionFragment;
 
+import ai.kitt.snowboy.AppResCopy;
 import ai.kitt.snowboy.MsgEnum;
 import ai.kitt.snowboy.audio.AudioDataSaver;
 import ai.kitt.snowboy.audio.PlaybackThread;
@@ -53,6 +54,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         statusBar = findViewById(R.id.status_bar);
         status = (TextView) findViewById(R.id.status);
         loading = findViewById(R.id.loading);
+
+        AppResCopy.copyResFromAssetsToSD(this);
 
         recordingThread = new RecordingThread(handle, new AudioDataSaver());
         playbackThread = new PlaybackThread();
