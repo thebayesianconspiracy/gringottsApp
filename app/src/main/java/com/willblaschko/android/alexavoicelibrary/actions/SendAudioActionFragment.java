@@ -1,6 +1,7 @@
 package com.willblaschko.android.alexavoicelibrary.actions;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -216,6 +217,12 @@ public class SendAudioActionFragment extends BaseListenerFragment {
                             startListening();
                         }
                     }, 500);
+                    Intent intent = getActivity().getIntent();
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // You need this if starting
+                    // the activity from a service
+                    intent.setAction(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    startActivity(intent);
                     break;
                 case MSG_INFO:
                     break;
