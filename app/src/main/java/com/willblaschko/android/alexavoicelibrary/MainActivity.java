@@ -63,6 +63,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
     MqttAndroidClient mqttAndroidClient;
     //final String serverUri = "tcp://broker.hivemq.com:1883";
+
     final String serverUri = "tcp://13.126.2.187:1883";
     final String customer_id = "33336369";
 
