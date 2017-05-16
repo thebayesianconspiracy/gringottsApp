@@ -1,11 +1,15 @@
 package com.willblaschko.android.alexavoicelibrary;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -58,7 +62,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private ArrayList<PayloadCard> payloadList;
 
     MqttAndroidClient mqttAndroidClient;
-    final String serverUri = "tcp://192.168.1.14:1883";
+    //final String serverUri = "tcp://broker.hivemq.com:1883";
+    final String serverUri = "tcp://13.126.2.187:1883";
     final String customer_id = "33336369";
 
 
@@ -70,6 +75,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     final String publishTopic = "exampleAndroidPublishTopic";
     final String publishMessage = "Hello World!";
 
+    final int WRITE_STORAGE = 1;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,8 +92,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         status = (TextView) findViewById(R.id.status);
         loading = findViewById(R.id.loading);
 
-        AppResCopy.copyResFromAssetsToSD(this);
-        loadFragment(new SendAudioActionFragment(), false);
+
 
 
         //loadFragment(fragment, false);
@@ -109,6 +114,66 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         mRecyclerView.setAdapter(myAdapter);
         initMQTT();
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        WRITE_STORAGE);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            initAlexa();
+        }
+    }
+
+    private void initAlexa() {
+        AppResCopy.copyResFromAssetsToSD(this);
+        loadFragment(new SendAudioActionFragment(), false);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case WRITE_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    initAlexa();
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     @Override
