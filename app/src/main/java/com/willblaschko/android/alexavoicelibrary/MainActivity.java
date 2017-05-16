@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private ArrayList<PayloadCard> payloadList;
 
     MqttAndroidClient mqttAndroidClient;
-    final String serverUri = "tcp://192.168.1.14:1883";
+    final String serverUri = "tcp://13.126.2.187:1883";
     final String customer_id = "33336369";
 
 
