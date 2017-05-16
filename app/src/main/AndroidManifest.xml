@@ -53,6 +53,8 @@
                     android:scheme="amzn" />
             </intent-filter>
         </activity>
+        <service android:name="org.eclipse.paho.android.service.MqttService">
+        </service>
     </application>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
     <uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>

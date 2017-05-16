@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Voice Pay</string>
+    <string name="app_name">VoicePay</string>
 
     <string name="status_listening">LISTENING…</string>
     <string name="status_processing">PROCESSING…</string>

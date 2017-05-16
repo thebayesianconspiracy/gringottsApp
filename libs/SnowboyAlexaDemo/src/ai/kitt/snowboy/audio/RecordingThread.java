@@ -61,7 +61,6 @@ public class RecordingThread {
     public void startRecording() {
         if (thread != null)
             return;
-
         shouldContinue = true;
         thread = new Thread(new Runnable() {
             @Override
@@ -148,5 +147,13 @@ public class RecordingThread {
             listener.stop();
         }
         Log.v(TAG, String.format("Recording stopped. Samples read: %d", shortsRead));
+    }
+
+    public boolean isRunning() {
+        if(thread != null){
+            return thread.isAlive();
+        }
+        else return false;
+
     }
 }

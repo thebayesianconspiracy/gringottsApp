@@ -51,7 +51,7 @@ public class SendAudioActionFragment extends BaseListenerFragment {
         recordingThread = new RecordingThread(handle, new AudioDataSaver());
         playbackThread = new PlaybackThread();
 
-        this.startRecording();
+        startRecording();
         return inflater.inflate(R.layout.fragment_action_audio, container, false);
     }
 
@@ -72,11 +72,13 @@ public class SendAudioActionFragment extends BaseListenerFragment {
     }
 
     private void startRecording() {
+        Log.i("KITT","Starting Listening");
         recordingThread.startRecording();
     }
 
 
     private void stopRecording() {
+        Log.i("KITT","Stopping Listening");
         recordingThread.stopRecording();
     }
 
@@ -139,6 +141,9 @@ public class SendAudioActionFragment extends BaseListenerFragment {
 
     @Override
     public void startListening() {
+        Log.i("AMZ","Start Listening");
+        stopRecording();
+        sleep();
         if(recorder == null){
             recorder = new RawAudioRecorder(AUDIO_RATE);
         }
@@ -183,21 +188,21 @@ public class SendAudioActionFragment extends BaseListenerFragment {
             }
             stopListening();
         }
-
     };
 
     private void stopListening(){
+        Log.i("AMZ","Stopping Listening");
         if(recorder != null) {
             recorder.stop();
             recorder.release();
             recorder = null;
-            while (true) {
-                try {
-                    startRecording();
-                    break;
-                } catch(Exception e) {
+        }
+        while (true) {
+            try {
+                startRecording();
+                break;
+            } catch(Exception e) {
 
-                }
             }
         }
     }
