@@ -75,6 +75,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     final String publishTopic = "exampleAndroidPublishTopic";
     final String publishMessage = "Hello World!";
 
+    final static public boolean DEBUG = false;
+
     final int WRITE_STORAGE = 1;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -389,12 +391,14 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             public void connectComplete(boolean reconnect, String serverURI) {
 
                 if (reconnect) {
-                    Toast.makeText(MainActivity.this, "Reconnected to : " + serverURI, Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Reconnected to : " + serverURI, Toast.LENGTH_LONG).show();
 
                     // Because Clean Session is true, we need to re-subscribe
                     subscribeToTopic();
                 } else {
-                    Toast.makeText(MainActivity.this, "Connected to: " + serverURI, Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Connected to: " + serverURI, Toast.LENGTH_LONG).show();
 
                 }
             }
@@ -406,7 +410,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                Toast.makeText(MainActivity.this, "Incoming message: " + message.toString(), Toast.LENGTH_LONG).show();
+                if (DEBUG)
+                    Toast.makeText(MainActivity.this, "Incoming message: " + message.toString(), Toast.LENGTH_LONG).show();
 
                 if (topic.equals(result_topic)) {
                     try {
@@ -563,7 +568,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             mqttAndroidClient.subscribe(user_topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
 
                 }
 
@@ -575,7 +581,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             mqttAndroidClient.subscribe(alexa_topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
 
                 }
 
@@ -588,7 +595,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             mqttAndroidClient.subscribe(result_topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
 
                 }
 
