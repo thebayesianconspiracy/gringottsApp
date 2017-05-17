@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     final String customer_id = "33336369";
 
 
-    String clientId = "VoicePayClient";
+    String clientId = "VoicePayClient" + (Math.random() * 1000 );
     final String user_topic = "/text/" + customer_id + "/messages/user";
     final String alexa_topic = "/text/" + customer_id + "/messages/alexa";
     final String result_topic = "/text/" + customer_id + "/messages/result";
