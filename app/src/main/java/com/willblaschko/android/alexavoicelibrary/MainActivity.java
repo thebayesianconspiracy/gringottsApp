@@ -207,7 +207,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText(R.string.status_listening);
-            loading.setVisibility(View.GONE);
+            //loading.setVisibility(View.GONE);
             statusBar.animate().alpha(1);
         }
     }
@@ -215,7 +215,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText(R.string.status_processing);
-            loading.setVisibility(View.VISIBLE);
+            //loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
         }
     }
@@ -223,7 +223,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText(R.string.status_speaking);
-            loading.setVisibility(View.VISIBLE);
+            //loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
         }
     }
@@ -231,14 +231,14 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText("");
-            loading.setVisibility(View.VISIBLE);
+            //loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
         }
     }
     protected void stateFinished(){
         if(status != null) {
             status.setText("");
-            loading.setVisibility(View.GONE);
+            //loading.setVisibility(View.GONE);
             statusBar.animate().alpha(0);
         }
     }
