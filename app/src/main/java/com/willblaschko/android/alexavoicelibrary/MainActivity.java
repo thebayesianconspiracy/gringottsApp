@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private static String strEnvWorkSpace = Constants.DEFAULT_WORK_SPACE;
 
     private RecyclerView mRecyclerView;
+    private TextView emptyView;
     private MyAdapter myAdapter;
     private ArrayList<PayloadCard> payloadList;
 
@@ -94,6 +95,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         status = (TextView) findViewById(R.id.status);
         loading = findViewById(R.id.loading);
 
+        emptyView = (TextView) findViewById(R.id.empty_view);
 
 
 
@@ -410,6 +412,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
+                emptyView.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
                 if (DEBUG)
                     Toast.makeText(MainActivity.this, "Incoming message: " + message.toString(), Toast.LENGTH_LONG).show();
 
