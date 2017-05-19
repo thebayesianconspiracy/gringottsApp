@@ -11,12 +11,12 @@
         android:layout_alignTop="@+id/bottom_wrapper"
         android:layout_width="match_parent"
         android:visibility="gone"
-        android:layout_height="450dp"/>
+        android:layout_height="430dp"/>
 
     <TextView
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
-        android:layout_height="450dp"
+        android:layout_height="430dp"
         android:gravity="center"
         android:layout_alignParentTop="true"
         android:layout_alignTop="@+id/bottom_wrapper"

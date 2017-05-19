@@ -399,9 +399,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
                     // Because Clean Session is true, we need to re-subscribe
                     subscribeToTopic();
                 } else {
-                    if (DEBUG)
-                        Toast.makeText(MainActivity.this, "Connected to: " + serverURI, Toast.LENGTH_LONG).show();
-
+                    Toast.makeText(MainActivity.this, "Connected to: " + serverURI, Toast.LENGTH_SHORT).show();
                 }
             }
 
