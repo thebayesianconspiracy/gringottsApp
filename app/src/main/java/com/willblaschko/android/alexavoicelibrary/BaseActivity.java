@@ -227,7 +227,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
         public void start() {
             startTime = System.currentTimeMillis();
             Log.i(TAG, "Event Start");
-            setState(STATE_PROCESSING);
+            setState(STATE_LISTENING);
         }
 
         @Override
@@ -250,8 +250,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
                 @Override
                 public void run() {
                     long totalTime = System.currentTimeMillis() - startTime;
-                    Toast.makeText(BaseActivity.this, "Total request time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
-                    //Log.i(TAG, "Total request time: "+totalTime+" miliseconds");
+                    if (MainActivity.DEBUG)
+                        Toast.makeText(BaseActivity.this, "Total request time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Total request time: "+totalTime+" miliseconds");
                 }
             });
         }
@@ -305,7 +306,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
                 @Override
                 public void run() {
                     long totalTime = System.currentTimeMillis() - startTime;
-                    Toast.makeText(BaseActivity.this, "Total interaction time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
+                    if (MainActivity.DEBUG)
+                        Toast.makeText(BaseActivity.this, "Total interaction time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
                     Log.i(TAG, "Total interaction time: "+totalTime+" miliseconds");
                 }
             });
@@ -465,7 +467,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
         inst.sendKeyDownUpSync(keyCode);
     }
 
-    private void setState(final int state){
+    public void setState(final int state){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

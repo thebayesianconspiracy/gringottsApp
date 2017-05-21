@@ -10,8 +10,18 @@
         android:layout_alignParentTop="true"
         android:layout_alignTop="@+id/bottom_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="450dp"/>
+        android:visibility="gone"
+        android:layout_height="430dp"/>
 
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="430dp"
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignTop="@+id/bottom_wrapper"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:text="Ask VoicePay!" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,6 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
             android:id="@+id/frame" />
 
         <LinearLayout
@@ -35,12 +46,13 @@
             android:orientation="vertical"
             android:layout_gravity="center"
             android:gravity="center"
-            android:padding="15dp"
+            android:padding="5dp"
             android:background="#212121"
-            android:elevation="15dp"
+            android:elevation="8dp"
             android:id="@+id/status_bar"
-            android:visibility="gone"
+            android:visibility="visible"
             android:alpha="0">
+
 
             <ProgressBar
                 android:layout_width="30dp"
@@ -48,17 +60,18 @@
                 android:id="@+id/loading"
                 android:layout_gravity="center"
                 style="?android:attr/progressBarStyleLarge"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_marginRight="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginLeft="0dp"
-                android:layout_marginStart="0dp"/>
+                android:layout_marginStart="0dp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceLarge"
+                android:textAppearance="?android:textAppearanceSmall"
                 android:id="@+id/status"
                 android:gravity="center"
+                android:textColor="@android:color/white"
                 android:layout_gravity="center"
                 android:text="@string/status_listening"/>
         </LinearLayout>

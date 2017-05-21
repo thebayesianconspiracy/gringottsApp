@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private static String strEnvWorkSpace = Constants.DEFAULT_WORK_SPACE;
 
     private RecyclerView mRecyclerView;
+    private TextView emptyView;
     private MyAdapter myAdapter;
     private ArrayList<PayloadCard> payloadList;
 
@@ -76,6 +77,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     final String publishTopic = "exampleAndroidPublishTopic";
     final String publishMessage = "Hello World!";
 
+    final static public boolean DEBUG = false;
+
     final int WRITE_STORAGE = 1;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,6 +96,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         status = (TextView) findViewById(R.id.status);
         loading = findViewById(R.id.loading);
 
+        emptyView = (TextView) findViewById(R.id.empty_view);
 
 
 
@@ -206,7 +210,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText(R.string.status_listening);
-            loading.setVisibility(View.GONE);
+            //loading.setVisibility(View.GONE);
             statusBar.animate().alpha(1);
         }
     }
@@ -214,7 +218,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText(R.string.status_processing);
-            loading.setVisibility(View.VISIBLE);
+            //loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
         }
     }
@@ -222,7 +226,7 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText(R.string.status_speaking);
-            loading.setVisibility(View.VISIBLE);
+            //loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
         }
     }
@@ -230,14 +234,14 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
         if(status != null) {
             status.setText("");
-            loading.setVisibility(View.VISIBLE);
+            //loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
         }
     }
     protected void stateFinished(){
         if(status != null) {
             status.setText("");
-            loading.setVisibility(View.GONE);
+            //loading.setVisibility(View.GONE);
             statusBar.animate().alpha(0);
         }
     }
@@ -390,13 +394,13 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             public void connectComplete(boolean reconnect, String serverURI) {
 
                 if (reconnect) {
-                    Toast.makeText(MainActivity.this, "Reconnected to : " + serverURI, Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Reconnected to : " + serverURI, Toast.LENGTH_LONG).show();
 
                     // Because Clean Session is true, we need to re-subscribe
                     subscribeToTopic();
                 } else {
-                    Toast.makeText(MainActivity.this, "Connected to: " + serverURI, Toast.LENGTH_LONG).show();
-
+                    Toast.makeText(MainActivity.this, "Connected to: " + serverURI, Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -407,7 +411,10 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                Toast.makeText(MainActivity.this, "Incoming message: " + message.toString(), Toast.LENGTH_LONG).show();
+                emptyView.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                if (DEBUG)
+                    Toast.makeText(MainActivity.this, "Incoming message: " + message.toString(), Toast.LENGTH_LONG).show();
 
                 if (topic.equals(result_topic)) {
                     try {
@@ -564,7 +571,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             mqttAndroidClient.subscribe(user_topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
 
                 }
 
@@ -576,7 +584,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             mqttAndroidClient.subscribe(alexa_topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
 
                 }
 
@@ -589,7 +598,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
             mqttAndroidClient.subscribe(result_topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
+                    if (DEBUG)
+                        Toast.makeText(MainActivity.this, "Subscribed!", Toast.LENGTH_LONG).show();
 
                 }
 
